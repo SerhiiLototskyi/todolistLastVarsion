@@ -8,10 +8,10 @@ import {
     addTodolistAC,
     changeTodolistFilterAC,
     changeTodolistTitleAC,
-    removeTodolistAC, setTodolistAC,
-    todolistsReducer
+    removeTodolistAC,
+    setTodolistAC
 } from './state/todolists-reducer';
-import {addTaskAC, changeTaskStatusAC, changeTaskTitleAC, removeTaskAC, tasksReducer} from './state/tasks-reducer';
+import {addTaskAC, changeTaskStatusAC, changeTaskTitleAC, removeTaskAC} from './state/tasks-reducer';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppRootStateType} from './state/store';
 import {todolistAPI} from "./api/todolist-api";
@@ -42,8 +42,10 @@ function AppWithRedux() {
     const dispatch = useDispatch();
 
     const removeTask = useCallback(function (id: string, todolistId: string) {
-        const action = removeTaskAC(id, todolistId);
-        dispatch(action);
+        todolistAPI.deleteTask(todolistId, id)
+            .then((res) => {
+                dispatch(removeTaskAC(id, todolistId))
+            })
     }, [dispatch]);
 
     const addTask = useCallback(function (title: string, todolistId: string) {
@@ -52,7 +54,7 @@ function AppWithRedux() {
             .then((res) => {
                 dispatch(addTaskAC(title, todolistId))
             })
-        
+
     }, [dispatch]);
 
     const changeStatus = useCallback(function (id: string, isDone: boolean, todolistId: string) {
@@ -61,8 +63,19 @@ function AppWithRedux() {
     }, [dispatch]);
 
     const changeTaskTitle = useCallback(function (id: string, newTitle: string, todolistId: string) {
-        const action = changeTaskTitleAC(id, newTitle, todolistId);
-        dispatch(action);
+        let task = {
+            title: newTitle,
+            description: '',
+            completed: false,
+            status: '',
+            priority: null,
+            startDate: null,
+            deadline: null
+        }
+        todolistAPI.updateTaskTitle(todolistId, id, task)
+            .then((res) => {
+                dispatch(changeTaskTitleAC(id, newTitle, todolistId))
+            })
     }, [dispatch]);
 
     const changeFilter = useCallback(function (value: FilterValuesType, todolistId: string) {

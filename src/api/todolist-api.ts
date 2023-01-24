@@ -10,8 +10,7 @@ let instance = axios.create({
 
 export const todolistAPI = {
     getTodolists() {
-        return instance.get("todo-lists")
-
+        return instance.get<Array<todolistTypeResponce>>("todo-lists")
     },
     createTodolist(title: string) {
         return instance.post("todo-lists", {title})
@@ -29,17 +28,33 @@ export const todolistAPI = {
         return instance.post(`todo-lists/${todolistId}/tasks`, {title})
     },
     getTasks(todolistId: string) {
-        return instance.get(`https://social-network.samuraijs.com/api/1.1//todo-lists/ + ${todolistId} +/tasks`)
 
+        return instance.get(`todo-lists/${todolistId}/tasks`)
+    },
+    deleteTask(todolistId: string, taskId: string) {
+        return instance.delete(`todo-lists/${todolistId}/tasks/${taskId}`)
+    },
+    updateTaskTitle(todolistId: string, taskId: string,task:any) {
+        return instance.delete(`todo-lists/${todolistId}/tasks/${taskId}`,task)
     }
+
 }
 type todolistTypeResponce = {
     id: string
     title: string
-    addDate?: string
-    order?: number
+    addDate: string
+    order: number
 
 }
+type CreateTodolistResponseType = {
+    resultCode: number
+    messages: Array<string>
+    fieldsErrors: Array<string>
+    data: {
+        item: todolistTypeResponce
+    }
+}
+
 type getTodolists = {
     data: {
         data: todolistTypeResponce[]
